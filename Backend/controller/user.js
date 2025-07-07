@@ -6,7 +6,7 @@ const JWT=require("jsonwebtoken")
 const userSignUp =async (req,res)=>{
 
     try {
-        const {firstName,lastName,email,password,role}=req.body;
+        const {firstName,lastName,email,password,role,designation}=req.body;
     //  form helper
 
     userSignUpValidation(req);
@@ -17,7 +17,7 @@ const userSignUp =async (req,res)=>{
 
     //creating the the instance of my model
 
-    const user=User({firstName,lastName,email,password:hashedPassword,role});
+    const user=User({firstName,lastName,email,password:hashedPassword,role,designation});
 
     
     //save the user
@@ -84,4 +84,19 @@ try {
     
 }
 }
-module.exports={userSignUp,userLogin};
+
+const getAllAdminData= async (req,res)=>{
+    try {
+        const users=await User.find({role:"admin"},"firstName lastName designation _id ");
+
+        res.status(200).json({
+            message:"All admin data",
+            data:users
+        })
+    } catch (error) {
+        res.status(500).json({
+            message:"Error while fetching admin data -> "+error.message
+        })
+    }
+}
+module.exports={userSignUp,userLogin,getAllAdminData};

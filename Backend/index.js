@@ -4,6 +4,7 @@ const http=require("http")
 require("dotenv").config();
 const app=express();
 const authRouter=require("./routes/user")
+const visitorRouter=require("./routes/visitors")
 const cookieParser=require("cookie-parser")
 
 
@@ -15,9 +16,7 @@ app.use(express.json());
 
 //routes
 app.use("/auth",authRouter)
-
-
-
+app.use("/visitors",visitorRouter)
 
 const Port=3000;
 
