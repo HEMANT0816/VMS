@@ -1,9 +1,10 @@
 const mongoose=require("mongoose");
 
-
+require("dotenv").config();
 const connect= async ()=>{
 
-    mongoose.connect("mongodb+srv://hemantsain:Dkv1YOSOY9EAV2F4@dummycluster.xx2x1zz.mongodb.net/VMS-System")
+    
+    mongoose.connect(process.env.MONGO_DB_URL)
 
 }
 

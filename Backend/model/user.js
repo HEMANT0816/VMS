@@ -4,7 +4,12 @@ const mongoose = require('mongoose');
 const USER_ROLES = ['guard', 'admin', 'superadmin'];
 
 const userSchema = new mongoose.Schema({
-  name: {
+  firstName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  lastName: {
     type: String,
     required: true,
     trim: true,

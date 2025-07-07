@@ -1,33 +1,87 @@
-const User=require("../model/user")
+const User =require("../model/user")
+const {userSignUpValidation}=require("../helper/user")
+const bcrypt = require("bcrypt")
+const JWT=require("jsonwebtoken")
 
+const userSignUp =async (req,res)=>{
 
-const signUp=async (req,res)=>{
-     try {
-    const { name, email, password, role } = req.body;
+    try {
+        const {firstName,lastName,email,password,role}=req.body;
+    //  form helper
 
-    // Basic validation
-    if (!name || !email || !password || !role) return res.status(400).json({ message: 'All fields required' });
+    userSignUpValidation(req);
 
-    // Check if user exists
-    const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ message: 'User already exists' });
+    //password encryption
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword =await bcrypt.hash(password,10);
 
-    // Generate OTP
-    const otp = generateOTP();
-    OTPStore.set(email, { otp, userData: { name, email, password: hashedPassword, role }, createdAt: Date.now() });
+    //creating the the instance of my model
 
-    // Mock send OTP
-    console.log(`🔐 OTP for ${email} is ${otp}`);
+    const user=User({firstName,lastName,email,password:hashedPassword,role});
 
-    res.status(200).json({ message: 'OTP sent to your email (mocked)' });
+    
+    //save the user
 
-  } catch (err) {
-    res.status(500).json({ message: 'Signup failed', error: err.message });
-  }
+    const newUser=await user.save();
+
+    res.status(201).json({
+        message:"user created success",
+        data:newUser,
+        
+    })
+
+    } catch (error) {
+        res.json({
+            message:"user signup failed due to ->"+error.message
+        })
+    }
+
 }
 
+const userLogin =async (req,res)=>{
+try {
+    const {email,password}=req.body;
 
-module.exports={signUp}
+    if(!email||!password){
+        throw new Error("need all the arguments")
+    }
+
+    const user=await User.findOne({email});
+
+    if(!user){
+        throw new error("Invalid crediantail")
+    }
+
+    
+   
+    
+    const isverified=await bcrypt.compare(password,user.password);
+
+    if(!isverified){
+         throw new Error("Invalid crediantail")
+    }
+    const Payload={
+        userid:user._id,
+        role:user.role
+    }
+    const secret=process.env.JWT_SECRET;
+
+    const Token=JWT.sign(Payload,secret)
+
+
+   
+
+    res.cookie("token",Token).json({
+        message:"login Sucessful"
+    })
+
+
+} catch (error) {
+
+    res.status(401).json({
+        message:"error while login -> "+error.message
+    })
+    
+}
+}
+module.exports={userSignUp,userLogin};

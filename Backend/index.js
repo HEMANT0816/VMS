@@ -1,11 +1,28 @@
 const express =require("express");
-
-const DB=require("./config/database")
-
+const DB=require("./config/database");
+const http=require("http")
+require("dotenv").config();
 const app=express();
+const authRouter=require("./routes/user")
+const cookieParser=require("cookie-parser")
+
+
+//middleware
+app.use(cookieParser());
+app.use(express.json());
+
+
+
+//routes
+app.use("/auth",authRouter)
+
+
 
 
 const Port=3000;
+
+
+
 
 
 //listen my server
